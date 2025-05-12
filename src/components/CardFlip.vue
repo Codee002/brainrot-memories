@@ -3,7 +3,7 @@
     <div
       class="card__inner"
       @click="flipCard"
-      :class="{ 'is-flipped': isFlip }"
+      :class="{ 'is-flipped': isFlip, 'is-disable': isDisable }"
     >
       <div class="card__face card__face--front">
         <div
@@ -31,10 +31,16 @@ export default {
       type: String,
       required: true,
     },
+
+    card: {
+      type: [Array, Object, String, Number],
+      required: true,
+    },
   },
 
   data() {
     return {
+      isDisable: false,
       isFlip: false,
       isMute: false,
       image: "",
@@ -42,17 +48,41 @@ export default {
   },
 
   methods: {
-    flipCard() {
-      this.isFlip = !this.isFlip;
+    // muteSound() {
+    //   this.$refs.clickSound.muted = this.isMute;
+    //   this.isMute = !this.isMute;
+    //   this.$refs.clickSound.currentTime = 0;
+    // },
 
-      this.$refs.clickSound.muted = this.isMute;
-      this.isMute = !this.isMute;
+    muteSound() {
+      this.$refs.clickSound.muted = true;
       this.$refs.clickSound.currentTime = 0;
+    },
+
+    playSound() {
+      this.$refs.clickSound.muted = false;
       this.$refs.clickSound.play();
+    },
+
+    flipCard() {
+      if (this.isDisable == true) return false;
+      this.isFlip = !this.isFlip;
+      this.isDisable = true;
+      if (this.isFlip == true) this.$emit("onFlip", this.card);
+
+      this.muteSound();
+      this.playSound();
 
       this.imgUrl.then((url) => {
         this.image = url;
       });
+    },
+
+    flipBack() {
+      this.isFlip = false;
+      this.isDisable = false;
+
+      this.muteSound();
     },
   },
 };
@@ -61,12 +91,13 @@ export default {
 <style lang="css" scoped>
 .card {
   display: inline-flex;
-  width: 7.5rem;
-  height: 10rem;
+  width: 7.5em;
+  height: 10em;
   margin: 1rem;
   border-radius: 1rem;
   border: 0px;
   color: var(--dark);
+  background-color: var(--dark);
 }
 
 .card__inner {
@@ -76,11 +107,16 @@ export default {
   height: 100%;
   transition: 1s;
   transform-style: preserve-3d;
+  border-radius: 1rem;
   background-color: var(--light);
 }
 
 .card__inner.is-flipped {
   transform: rotateY(-180deg);
+}
+
+.card__inner.is-disable {
+  cursor: auto;
 }
 
 .card__face {
