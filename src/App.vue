@@ -1,9 +1,12 @@
 <template>
   <main-screen v-if="statusMatch == 'default'" @onStart="onHandleBeforeStart" />
-  <interac-screen v-if="statusMatch == 'match'" 
-  :cards = "settings.cards" />
-  <result-screen v-if="statusMatch == 'result'" />
-  <footer-screen />
+  <interac-screen
+    v-if="statusMatch == 'match'"
+    :cards="settings.cards"
+    @onFinish="onFinish"
+  />
+  <result-screen v-if="statusMatch == 'result'" :timePlay="settings.timePlay" @onPlayAgain="onPlayAgain" />
+  <footer-screen  v-if="statusMatch == 'default' || statusMatch == 'result'"  />
 </template>
 
 <script>
@@ -28,6 +31,7 @@ export default {
       settings: {
         mode: 0,
         startAt: null,
+        timePlay: null,
         cards: [],
       },
       statusMatch: "default",
@@ -48,12 +52,22 @@ export default {
       this.settings.cards = shuffled(shuffled(shuffled(shuffled(cards))));
 
       // Tạo thời gian chơi
-      this.startAt = new Date().getTime();
+      this.settings.startAt = new Date().getTime();
 
       // Đổi giao diện
       this.statusMatch = "match";
-
     },
+
+    onFinish() {
+      this.settings.timePlay = new Date().getTime() - this.settings.startAt;
+      this.statusMatch = "result";
+    },
+
+    onPlayAgain()
+    {
+      // Đổi giao diện
+      this.statusMatch = "default";
+    }
   },
 };
 </script>
