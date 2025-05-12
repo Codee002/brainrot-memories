@@ -1,5 +1,4 @@
-# brainrot-memories
-https://brainrotmemories.netlify.app/
+# brainrot-memories https://brainrotmemories.netlify.app/
 
 ## Project setup
 ```
